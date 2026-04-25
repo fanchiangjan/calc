@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>複利跟單計算系統 (30/40/50次連動)</title>
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --accent: #f39c12;
+        }
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+ <!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>複利跟單計算系統 (30/40/50次連動)</title>
+    <style>
+        :root {
+            --primary: #00d2ff;
+            --secondary: #3a7bd5;
+            --bg: #121212;
+            --card-bg: #1e1e1e;
+            --text: #e0e0e0;
+            --accent: #f39c12;
+        }
+        body {
+            font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 1000px;
+        }
+        h1 { text-align: center; color: var(--primary); margin-bottom: 30px; }
+        
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            border-top: 4px solid var(--secondary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .card.highlight { border-top-color: var(--accent); }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+        input[readonly] { background: #1a1a1a; color: var(--accent); border-style: dashed; }
+
+        .withdraw-box {
+            background: rgba(243, 156, 18, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: #252525;
+            border-radius: 8px;
+        }
+        .res-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
+        .res-val { font-weight: bold; }
+        .final-val { color: var(--primary); font-size: 1.1rem; }
+
+        .arrow {
+            text-align: center;
+            font-size: 24px;
+            color: var(--primary);
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>投資收益分列式計算 (複利模式)</h1>
+    
+    <div class="grid-layout">
+        <div class="card">
+            <div class="section-title">第一階段：30次 <span style="color:#888; font-size:0.8rem;">手續費18%</span></div>
+            <div class="input-group">
+                <label>初始本金 (NT$)</label>
+                <input type="number" id="p1" value="500000" oninput="calcAll()">
+            </div>
+            <div class="input-group">
+                <label>預期報酬率 (%)</label>
+                <input type="number" id="r1" value="5" oninput="syncParams('r', 1)">
+            </div>
+            <div class="input-group">
+                <label>倉位比例 (%)</label>
+                <input type="number" id="pos1" value="73" oninput="syncParams('pos', 1)">
+            </div>
+            
+            <div class="result-box">
+                <div class="res-row"><span>30次總獲利:</span> <span class="res-val" id="profit1">0</span></div>
+                <div class="res-row"><span>結算總值:</span> <span class="res-val final-val" id="end1">0</span></div>
+            </div>
+        </div>
+
+        <div class="card highlight">
+            <div class="section-title">第二階段：40次 <span style="color:#888; font-size:0.8rem;">手續費17%</span></div>
+            
+            <div class="withdraw-box">
+                <label>從前段結算中「提領」(NT$)</label>
+                <input type="number" id="w2" value="0" placeholder="要領出的現金" oninput="calcAll()">
+            </div>
+
+            <div class="input-group">
+                <label>投入本金 (前段結算 - 提領)</label>
+                <input type="number" id="p2" readonly>
+            </div>
+            <div class="input-group">
+                <label>預期報酬率 (%)</label>
+                <input type="number" id="r2" value="5" oninput="syncParams('r', 2)">
+            </div>
+            <div class="input-group">
+                <label>倉位比例 (%)</label>
+                <input type="number" id="pos2" value="73" oninput="syncParams('pos', 2)">
+            </div>
+
+            <div class="result-box">
+                <div class="res-row"><span>40次總獲利:</span> <span class="res-val" id="profit2">0</span></div>
+                <div class="res-row"><span>結算總值:</span> <span class="res-val final-val" id="end2">0</span></div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="section-title">第三階段：50次 <span style="color:#888; font-size:0.8rem;">手續費16%</span></div>
+            
+            <div class="withdraw-box">
+                <label>從前段結算中「提領」(NT$)</label>
+                <input type="number" id="w3" value="0" placeholder="要領出的現金" oninput="calcAll()">
+            </div>
+
+            <div class="input-group">
+                <label>投入本金 (前段結算 - 提領)</label>
+                <input type="number" id="p3" readonly>
+            </div>
+            <div class="input-group">
+                <label>預期報酬率 (%)</label>
+                <input type="number" id="r3" value="5" oninput="calcAll()">
+            </div>
+            <div class="input-group">
+                <label>倉位比例 (%)</label>
+                <input type="number" id="pos3" value="73" oninput="calcAll()">
+            </div>
+
+            <div class="result-box">
+                <div class="res-row"><span>50次總獲利:</span> <span class="res-val" id="profit3">0</span></div>
+                <div class="res-row"><span>最終總資產:</span> <span class="res-val final-val" id="end3">0</span></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 同步參數：如果使用者改了前一階段的報酬率或倉位，後面的預設跟著改
+    function syncParams(type, fromStep) {
+        const val = document.getElementById(type + fromStep).value;
+        for (let i = fromStep + 1; i <= 3; i++) {
+            document.getElementById(type + i).value = val;
+        }
+        calcAll();
+    }
+
+    function format(num) {
+        return "NT$ " + Math.round(num).toLocaleString();
+    }
+
+    function calcStep(principal, rate, pos, feeRate, times) {
+        // 單次毛利 = 本金 * 倉位% * 報酬率%
+        const singleGross = principal * (pos/100) * (rate/100);
+        // 單次淨利 = 毛利 - (毛利 * 手續費%)
+        const singleNet = singleGross * (1 - (feeRate/100));
+        // 總獲利
+        const totalProfit = singleNet * times;
+        return {
+            profit: totalProfit,
+            endBalance: principal + totalProfit
+        };
+    }
+
+    function calcAll() {
+        // 第一階段 30次
+        const p1 = parseFloat(document.getElementById('p1').value) || 0;
+        const r1 = parseFloat(document.getElementById('r1').value) || 0;
+        const pos1 = parseFloat(document.getElementById('pos1').value) || 0;
+        const res1 = calcStep(p1, r1, pos1, 18, 30);
+        
+        document.getElementById('profit1').innerText = format(res1.profit);
+        document.getElementById('end1').innerText = format(res1.endBalance);
+
+        // 第二階段 40次
+        const w2 = parseFloat(document.getElementById('w2').value) || 0;
+        const p2 = res1.endBalance - w2;
+        document.getElementById('p2').value = Math.round(p2);
+        
+        const r2 = parseFloat(document.getElementById('r2').value) || 0;
+        const pos2 = parseFloat(document.getElementById('pos2').value) || 0;
+        const res2 = calcStep(p2, r2, pos2, 17, 40);
+        
+        document.getElementById('profit2').innerText = format(res2.profit);
+        document.getElementById('end2').innerText = format(res2.endBalance);
+
+        // 第三階段 50次
+        const w3 = parseFloat(document.getElementById('w3').value) || 0;
+        const p3 = res2.endBalance - w3;
+        document.getElementById('p3').value = Math.round(p3);
+        
+        const r3 = parseFloat(document.getElementById('r3').value) || 0;
+        const pos3 = parseFloat(document.getElementById('pos3').value) || 0;
+        const res3 = calcStep(p3, r3, pos3, 16, 50);
+        
+        document.getElementById('profit3').innerText = format(res3.profit);
+        document.getElementById('end3').innerText = format(res3.endBalance);
+    }
+
+    // 初始化執行一次
+    calcAll();
+</script>
+
+</body>
+</html>
+           border-top: 4px solid var(--secondary);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+
+        .card.highlight { border-top-color: var(--accent); }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+        }
+
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 0.85rem; color: #aaa; margin-bottom: 4px; }
+        input {
+            width: 100%;
+            padding: 10px;
+            background: #2a2a2a;
+            border: 1px solid #444;
+            color: #fff;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+        input:focus { outline: none; border-color: var(--primary); }
+        input[readonly] { background: #1a1a1a; color: var(--accent); border-style: dashed; }
+
+        .withdraw-box {
+            background: rgba(243, 156, 18, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(243, 156, 18, 0.3);
+        }
+
+        .result-box {
+            margin-top: 15px;
+            padding: 12px;
+            background: #252525;
+            border-radius: 8px;
+        }
+        .res-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.95rem; }
+        .res-val { font-weight: bold; }
+        .final-val { color: var(--primary); font-size: 1.1rem; }
+
+        .arrow {
+            text-align: center;
+            font-size: 24px;
+            color: var(--primary);
+            padding: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .grid-layout { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>投資收益分列式計算 (複利模式)</h1>
+    
+    <div class="grid-layout">
+        <div class="card">
+            <div class="section-title">第一階段：30次 <span style="color:#888; font-size:0.8rem;">手續費18%</span></div>
+            <div class="input-group">
+                <label>初始本金 (NT$)</label>
+                <input type="number" id="p1" value="500000" oninput="calcAll()">
+            </div>
+            <div class="input-group">
+                <label>預期報酬率 (%)</label>
+                <input type="number" id="r1" value="5" oninput="syncParams('r', 1)">
+            </div>
+            <div class="input-group">
+                <label>倉位比例 (%)</label>
+                <input type="number" id="pos1" value="73" oninput="syncParams('pos', 1)">
+            </div>
+            
+            <div class="result-box">
+                <div class="res-row"><span>30次總獲利:</span> <span class="res-val" id="profit1">0</span></div>
+                <div class="res-row"><span>結算總值:</span> <span class="res-val final-val" id="end1">0</span></div>
+            </div>
+        </div>
+
+        <div class="card highlight">
+            <div class="section-title">第二階段：40次 <span style="color:#888; font-size:0.8rem;">手續費17%</span></div>
+            
+            <div class="withdraw-box">
+                <label>從前段結算中「提領」(NT$)</label>
+                <input type="number" id="w2" value="0" placeholder="要領出的現金" oninput="calcAll()">
+            </div>
+
+            <div class="input-group">
+                <label>投入本金 (前段結算 - 提領)</label>
+                <input type="number" id="p2" readonly>
+            </div>
+            <div class="input-group">
+                <label>預期報酬率 (%)</label>
+                <input type="number" id="r2" value="5" oninput="syncParams('r', 2)">
+            </div>
+            <div class="input-group">
+                <label>倉位比例 (%)</label>
+
