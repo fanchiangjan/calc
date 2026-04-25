@@ -3,142 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>複利跟單計算機 (靈活調整版)</title>
+    <title>跟單投資計算機</title>
     <style>
         :root { --primary: #00d2ff; --bg: #121212; --card-bg: #1e1e1e; --text: #e0e0e0; --accent: #f39c12; }
-        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); padding: 15px; }
-        .container { width: 100%; max-width: 900px; margin: auto; }
-        h2 { text-align: center; color: var(--primary); }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 15px; }
-        .card { background: var(--card-bg); border-radius: 10px; padding: 15px; border-top: 4px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
-        .card.highlight { border-top-color: var(--accent); }
+        body { font-family: sans-serif; background-color: var(--bg); color: var(--text); padding: 15px; margin: 0; }
+        .container { width: 100%; max-width: 500px; margin: auto; }
+        h2 { text-align: center; color: var(--primary); margin-bottom: 20px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; border-left: 5px solid var(--primary); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .step2 { border-left-color: var(--accent); }
+        .step3 { border-left-color: #4caf50; }
         label { display: block; font-size: 0.8rem; color: #aaa; margin-top: 10px; }
-        input { width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 5px; box-sizing: border-box; font-size: 1rem; }
-        input:focus { border-color: var(--primary); outline: none; }
-        .result { margin-top: 15px; padding: 10px; background: #252525; border-radius: 5px; font-size: 0.9rem; }
-        .row { display: flex; justify-content: space-between; margin-bottom: 5px; }
+        input { width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid #444; color: #fff; border-radius: 6px; box-sizing: border-box; font-size: 1rem; }
+        .result { margin-top: 10px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 8px; }
+        .row { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 0.9rem; }
         .val { font-weight: bold; color: var(--primary); }
-        .note { font-size: 0.7rem; color: #888; margin-top: 5px; }
-        .manual-hint { color: var(--accent); font-size: 0.7rem; margin-bottom: 5px; }
+        .final { border-top: 1px solid #444; padding-top: 5px; margin-top: 5px; color: #fff; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h2>跟單投資計算 (可手動修改本金)</h2>
-    <div class="grid">
-        <div class="card">
-            <strong>第一階段：30次 (18%)</strong>
-            <label>初始本金</label>
-            <input type="number" id="p1" value="500000" step="100" oninput="updateFromStep(1)">
-            <label>報酬率 (%)</label>
-            <input type="number" id="r1" value="5" oninput="calc()">
-            <label>倉位 (%)</label>
-            <input type="number" id="pos1" value="73" oninput="calc()">
-            <div class="result">
-                <div class="row"><span>階段總獲利:</span> <span class="val" id="profit1">0</span></div>
-                <div class="row"><span>原始結算:</span> <span id="raw1">0</span></div>
-            </div>
-        </div>
-
-        <div class="card highlight">
-            <strong>第二階段：40次 (17%)</strong>
-            <div class="manual-hint">※ 可直接修改下方投入本金</div>
-            <label>提領金額 (選填)</label>
-            <input type="number" id="w2" value="0" oninput="updateFromStep(1)">
-            <label>投入本金 (可手動調整)</label>
-            <input type="number" id="p2" step="100" oninput="updateFromStep(2)">
-            <label>報酬率 (%)</label>
-            <input type="number" id="r2" value="5" oninput="calc()">
-            <label>倉位 (%)</label>
-            <input type="number" id="pos2" value="73" oninput="calc()">
-            <div class="result">
-                <div class="row"><span>階段總獲利:</span> <span class="val" id="profit2">0</span></div>
-                <div class="row"><span>原始結算:</span> <span id="raw2">0</span></div>
-            </div>
-        </div>
-
-        <div class="card">
-            <strong>第三階段：50次 (16%)</strong>
-            <div class="manual-hint">※ 可直接修改下方投入本金</div>
-            <label>提領金額 (選填)</label>
-            <input type="number" id="w3" value="0" oninput="updateFromStep(2)">
-            <label>投入本金 (可手動調整)</label>
-            <input type="number" id="p3" step="100" oninput="calc()">
-            <label>報酬率 (%)</label>
-            <input type="number" id="r3" value="5" oninput="calc()">
-            <label>倉位 (%)</label>
-            <input type="number" id="pos3" value="73" oninput="calc()">
-            <div class="result">
-                <div class="row"><span>階段總獲利:</span> <span class="val" id="profit3">0</span></div>
-                <div class="row"><span>最終總資產:</span> <span class="val" id="raw3" style="color:#fff">0</span></div>
-            </div>
-        </div>
+    <h2>跟單複利計算機</h2>
+    
+    <div class="card">
+        <strong>第一階段：30次 (費率 18%)</strong>
+        <label>初始本金</label>
+        <input type="number" id="p1" value="30000" oninput="onInputP1()">
+        <label>報酬率 (%)</label>
+        <input type="number" id="r1" value="5" oninput="calculateAll()">
+        <label>倉位 (%)</label>
+        <input type="number" id="pos1" value="40" oninput="calculateAll()">
+        <div class="result" id="res1"></div>
     </div>
-    <div class="note" style="text-align:center; margin-top:20px;">
-        提示：所有計算均會自動將本金「無條件捨去」至百位數。
+
+    <div class="card step2">
+        <strong>第二階段：40次 (費率 17%)</strong>
+        <label>提領金額</label>
+        <input type="number" id="w2" value="0" oninput="onInputP1()">
+        <label>投入本金 (可手動修改)</label>
+        <input type="number" id="p2" oninput="onInputP2()">
+        <label>報酬率 (%)</label>
+        <input type="number" id="r2" value="5" oninput="calculateAll()">
+        <label>倉位 (%)</label>
+        <input type="number" id="pos2" value="40" oninput="calculateAll()">
+        <div class="result" id="res2"></div>
+    </div>
+
+    <div class="card step3">
+        <strong>第三階段：50次 (費率 16%)</strong>
+        <label>提領金額</label>
+        <input type="number" id="w3" value="0" oninput="onInputP2()">
+        <label>投入本金 (可手動修改)</label>
+        <input type="number" id="p3" oninput="calculateAll()">
+        <label>報酬率 (%)</label>
+        <input type="number" id="r3" value="5" oninput="calculateAll()">
+        <label>倉位 (%)</label>
+        <input type="number" id="pos3" value="40" oninput="calculateAll()">
+        <div class="result" id="res3"></div>
     </div>
 </div>
 
 <script>
-    function floorTo100(num) {
-        return Math.floor(num / 100) * 100;
-    }
+    const floor100 = n => Math.floor(n / 100) * 100;
+    const fmt = n => "NT$ " + Math.round(n).toLocaleString();
 
-    // 當前一段變動時，更新後一段的本金
-    function updateFromStep(step) {
-        if (step === 1) {
-            let p1 = parseFloat(document.getElementById('p1').value) || 0;
-            let r1 = (parseFloat(document.getElementById('r1').value) || 0) / 100;
-            let pos1 = (parseFloat(document.getElementById('pos1').value) || 0) / 100;
-            let profit1 = (p1 * pos1 * r1 * 0.82) * 30;
-            let total1 = p1 + profit1;
-            let w2 = parseFloat(document.getElementById('w2').value) || 0;
-            document.getElementById('p2').value = floorTo100(total1 - w2);
-        }
-        
-        if (step <= 2) {
-            let p2 = parseFloat(document.getElementById('p2').value) || 0;
-            let r2 = (parseFloat(document.getElementById('r2').value) || 0) / 100;
-            let pos2 = (parseFloat(document.getElementById('pos2').value) || 0) / 100;
-            let profit2 = (p2 * pos2 * r2 * 0.83) * 40;
-            let total2 = p2 + profit2;
-            let w3 = parseFloat(document.getElementById('w3').value) || 0;
-            document.getElementById('p3').value = floorTo100(total2 - w3);
-        }
-        calc();
-    }
-
-    function calc() {
-        const fmt = n => "NT$ " + Math.round(n).toLocaleString();
-        
-        // Step 1 計算
-        let p1 = floorTo100(parseFloat(document.getElementById('p1').value) || 0);
-        let r1 = (parseFloat(document.getElementById('r1').value) || 0) / 100;
-        let pos1 = (parseFloat(document.getElementById('pos1').value) || 0) / 100;
+    // 當修改 Step 1 或 提領 2 時，觸發 P2 自動更新
+    function onInputP1() {
+        let p1 = floor100(document.getElementById('p1').value);
+        let r1 = document.getElementById('r1').value / 100;
+        let pos1 = document.getElementById('pos1').value / 100;
         let profit1 = (p1 * pos1 * r1 * 0.82) * 30;
-        document.getElementById('profit1').innerText = fmt(profit1);
-        document.getElementById('raw1').innerText = fmt(p1 + profit1);
-
-        // Step 2 計算
-        let p2 = floorTo100(parseFloat(document.getElementById('p2').value) || 0);
-        let r2 = (parseFloat(document.getElementById('r2').value) || 0) / 100;
-        let pos2 = (parseFloat(document.getElementById('pos2').value) || 0) / 100;
-        let profit2 = (p2 * pos2 * r2 * 0.83) * 40;
-        document.getElementById('profit2').innerText = fmt(profit2);
-        document.getElementById('raw2').innerText = fmt(p2 + profit2);
-
-        // Step 3 計算
-        let p3 = floorTo100(parseFloat(document.getElementById('p3').value) || 0);
-        let r3 = (parseFloat(document.getElementById('r3').value) || 0) / 100;
-        let pos3 = (parseFloat(document.getElementById('pos3').value) || 0) / 100;
-        let profit3 = (p3 * pos3 * r3 * 0.84) * 50;
-        document.getElementById('profit3').innerText = fmt(profit3);
-        document.getElementById('raw3').innerText = fmt(p3 + profit3);
+        let end1 = p1 + profit1;
+        let w2 = document.getElementById('w2').value || 0;
+        document.getElementById('p2').value = floor100(end1 - w2);
+        onInputP2(); // 連鎖更新 P3
     }
 
-    // 初始執行一次
-    updateFromStep(1);
+    // 當修改 Step 2 或 提領 3 時，觸發 P3 自動更新
+    function onInputP2() {
+        let p2 = floor100(document.getElementById('p2').value);
+        let r2 = document.getElementById('r2').value / 100;
+        let pos2 = document.getElementById('pos2').value / 100;
+        let profit2 = (p2 * pos2 * r2 * 0.83) * 40;
+        let end2 = p2 + profit2;
+        let w3 = document.getElementById('w3').value || 0;
+        document.getElementById('p3').value = floor100(end2 - w3);
+        calculateAll();
+    }
+
+    function calculateAll() {
+        const steps = [
+            { id: 1, fee: 0.82, times: 30 },
+            { id: 2, fee: 0.83, times: 40 },
+            { id: 3, fee: 0.84, times: 50 }
+        ];
+
+        steps.forEach(s => {
+            let p = floor100(document.getElementById('p' + s.id).value || 0);
+            let r = (document.getElementById('r' + s.id).value || 0) / 100;
+            let pos = (document.getElementById('pos' + s.id).value || 0) / 100;
+            
+            let singleNet = (p * pos * r) * s.fee;
+            let totalProfit = singleNet * s.times;
+            let final = p + totalProfit;
+
+            document.getElementById('res' + s.id).innerHTML = `
+                <div class="row"><span>單次淨利:</span> <span>${fmt(singleNet)}</span></div>
+                <div class="row"><span>${s.times}次總淨利:</span> <span class="val">${fmt(totalProfit)}</span></div>
+                <div class="row final"><span>階段結算:</span> <span>${fmt(final)}</span></div>
+            `;
+        });
+    }
+
+    // 啟動初始化
+    onInputP1();
 </script>
 </body>
 </html>
